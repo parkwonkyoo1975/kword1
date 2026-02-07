@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>어휘력 100</title>
+    <style>
+        :root {
+            --bg-color: #f0f2f5; --card-bg: #ffffff; --primary: #4a90e2; --text-main: #333333;
+            --text-sub: #666666; --option-bg: #f8f9fa; --option-border: #eeeeee;
+            --success: #2ecc71; --danger: #ff6b6b;
+        }
+        [data-theme='dark'] {
+            --bg-color: #121212; --card-bg: #1e1e1e; --primary: #5da2ff; --text-main: #ffffff;
+            --text-sub: #bbbbbb; --option-bg: #252525; --option-border: #333333;
+        }
+        body { font-family: 'Pretendard', sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; display: flex; justify-content: center; min-height: 100vh; transition: 0.3s; }
+        .container { width: 100%; max-width: 500px; padding: 20px; box-sizing: border-box; position: relative; }
+        .hidden { display: none !important; }
+
+        /* 상단 바 */
+        .top-bar { display: flex; justify-content: space-between; align-items: center; padding-bottom: 15px; }
+        .header-btn { border: none; padding: 8px 12px; border-radius: 8px; font-size: 0.85rem; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .btn-end { background: var(--text-sub); color: white; }
+        .btn-review { background: var(--danger); color: white; margin-right: 5px; }
+
+        /* 테마 스위치 */
+        .theme-switch { display: inline-block; height: 24px; position: relative; width: 50px; }
+        .theme-switch input { display: none; }
+        .slider { background-color: #ccc; bottom: 0; cursor: pointer; left: 0; position: absolute; right: 0; top: 0; transition: .4s; border-radius: 34px; }
+        .slider:before { background-color: white; bottom: 4px; content: ""; height: 16px; left: 4px; position: absolute; transition: .4s; width: 16px; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--primary); }
+        input:checked + .slider:before { transform: translateX(26px); }
+
+        .card { background: var(--card-bg); padding: 40px 20px; border-radius: 20px; text-align: center; border: 1px solid var(--option-border); box-shadow: 0 10px 25px rgba(0,0,0,0.1); margin-top: 10px; }
+        .main-title { font-size: 2.2rem; font-weight: 800; color: var(--primary); margin-bottom: 10px; }
+
+        /* 퀴즈 UI */
+        .quiz-header { margin-bottom: 20px; border-bottom: 1px solid var(--option-border); padding-bottom: 10px; }
+        .info-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .q-cat { font-size: 0.8rem; background: var(--option-border); padding: 3px 8px; border-radius: 6px; font-weight: bold; }
+        .user-tag { color: var(--text-sub); font-size: 0.9rem; }
+        
+        .progress-info { display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--text-sub); font-weight: bold; margin-top: 5px; }
+        .progress-bar-bg { width: 100%; height: 6px; background: var(--option-border); border-radius: 3px; margin-top: 5px; overflow: hidden; }
+        .progress-bar-fill { height: 100%; background: var(--primary); width: 0%; transition: 0.3s; }
+
+        .question-box { font-size: 1.35rem; font-weight: 600; line-height: 1.6; margin-bottom: 30px; text-align: left; min-height: 60px; }
+        
+        .options-list { display: grid; gap: 12px; }
+        .option-item { background: var(--option-bg); border: 2px solid var(--option-border); border-radius: 16px; padding: 20px; cursor: pointer; transition: all 0.2s; text-align: left; }
+        .option-item.correct { border-color: var(--success) !important; background: rgba(46, 204, 113, 0.15); }
+        .option-item.wrong { border-color: var(--danger) !important; background: rgba(255, 107, 107, 0.15); }
+        .option-item.dimmed { opacity: 0.6; border-color: var(--option-border); }
+        
+        .feedback-row { display: flex; align-items: center; margin-top: 12px; font-weight: bold; }
+        .explanation-box { font-size: 0.95rem; color: var(--text-sub); margin-top: 10px; line-height: 1.6; border-top: 1px solid var(--option-border); padding-top: 10px; }
+
+        .quiz-content-area { padding-bottom: 140px; }
+
+        .footer-btn { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: calc(100% - 40px); max-width: 460px; padding: 20px; border-radius: 50px; border: none; background: var(--primary); color: white; font-weight: bold; font-size: 1.2rem; cursor: pointer; box-shadow: 0 5px 20px rgba(0,0,0,0.2); }
+        .sub-btn { background: var(--option-bg); border: 1px solid var(--option-border); color: var(--text-main); padding: 12px 25px; border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 10px; width: 80%; }
+        .badge { background: var(--danger); color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.8rem; margin-left: 5px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="top-bar">
+        <div id="quiz-controls" class="hidden">
+            <button class="header-btn btn-end" onclick="app.endStudy()">그만하기</button>
+            <button id="btn-to-review" class="header-btn btn-review hidden" onclick="app.switchToReview()">오답 복습</button>
+            <button id="btn-exit-review" class="header-btn btn-end hidden" onclick="app.exitReview()">복습 종료</button>
+        </div>
+        <div style="flex-grow: 1;"></div>
+        <label class="theme-switch"><input type="checkbox" id="theme-checkbox"><div class="slider"></div></label>
+    </div>
+
+    <div id="screen-start" class="card">
+        <div class="main-title">📚 어휘력 100</div>
+        <p style="color: var(--text-sub);">속담, 관용구, 고사성어</p>
+        <input type="text" id="user-name" placeholder="이름을 입력하세요" style="width:80%; padding:15px; border-radius:10px; border:1px solid var(--option-border); background:var(--option-bg); color:var(--text-main); margin:20px 0; text-align:center;">
+        <br>
+        <button onclick="app.init('normal')" style="padding:15px 50px; border-radius:12px; border:none; background:var(--primary); color:white; font-weight:bold; cursor:pointer; width:80%;">시작하기</button>
+        <button id="review-btn-start" class="sub-btn hidden" onclick="app.init('review')" style="margin-top:15px;">오답 복습하기 <span id="start-badge" class="badge">0</span></button>
+    </div>
+
+    <div id="screen-quiz" class="hidden quiz-content-area">
+        <div class="quiz-header">
+            <div class="info-row">
+                <span id="q-cat" class="q-cat">속담</span>
+                <span id="user-tag" class="user-tag"></span>
+            </div>
+            <div class="progress-info">
+                <span id="progress-text-solved">푼 문제: 0</span>
+                <span id="progress-text-remain">남은 문제: 100</span>
+            </div>
+            <div class="progress-bar-bg">
+                <div id="progress-bar-fill" class="progress-bar-fill"></div>
+            </div>
+        </div>
+        
+        <div id="review-tag" style="color:var(--danger); font-size:0.9rem; font-weight:bold; margin-bottom:15px; text-align:center;" class="hidden">⚠️ 오답 복습 모드 (맞히면 사라져요!)</div>
+        <div class="question-box" id="q-text"></div>
+        <div id="options" class="options-list"></div>
+        <button id="next-btn" class="footer-btn hidden" onclick="app.next()">다음 문제로 👉</button>
+    </div>
+
+    <div id="screen-result" class="card hidden">
+        <h1 id="result-title" style="color:var(--success);">수고했어요!</h1>
+        <div style="font-size:3rem; font-weight:900; margin: 20px 0;" id="final-score">0 / 100</div>
+        <p id="result-msg" style="margin-bottom:30px; color:var(--text-sub); line-height:1.6;"></p>
+        
+        <button id="review-btn-result" class="sub-btn hidden" onclick="app.init('review')" style="background:var(--danger); color:white; border:none; margin-bottom:10px; width:100%;">틀린 문제 복습하기</button>
+        
+        <button onclick="location.reload()" style="width:80%; padding:12px; border-radius:10px; border:none; background:var(--primary); color:white; font-weight:bold; cursor:pointer;">처음으로</button>
+    </div>
+</div>
+
+<script>
+    // 100개 통합 데이터베이스
+    const database = [
+        // 속담 50개
+        {c:"속담", q:"상대방이 나에게 잘해야 나도 상대방에게 잘한다는 뜻", a:"가는 말이 고와야 오는 말이 곱다", d:"친절한 말을 먼저 건네야 상대방도 친절하게 대한다는 교훈입니다."},
+        {c:"속담", q:"일이 이미 잘못된 뒤에 손을 써도 소용없다는 뜻", a:"소 잃고 외양간 고친다", d:"평소 대비하지 않고 문제가 생긴 뒤에야 후회하는 상황을 비유합니다."},
+        {c:"속담", q:"형편이 나아진 뒤에 지난날의 어려움을 잊는다는 뜻", a:"개구리 올챙이 적 생각 못 한다", d:"성공한 사람이 과거의 힘들었던 시절을 잊고 거만하게 행동함을 비꼬는 말입니다."},
+        {c:"속담", q:"어릴 때 배운 나쁜 습관은 늙어서도 고치기 어렵다는 뜻", a:"세 살 버릇 여든까지 간다", d:"어릴 때 형성된 습관은 평생 가기 때문에 처음에 잘 배워야 함을 강조합니다."},
+        {c:"속담", q:"작은 것이라도 계속 모으면 나중에 큰 것이 된다는 뜻", a:"티끌 모아 태산", d:"아무리 작은 노력이라도 꾸준히 모으면 큰 결실을 맺을 수 있다는 뜻입니다."},
+        {c:"속담", q:"쉬운 일이라도 서로 힘을 합치면 훨씬 쉽다는 뜻", a:"백지장도 맞들면 낫다", d:"가벼운 종이 한 장이라도 함께 들면 더 쉽듯이 협동의 중요성을 강조합니다."},
+        {c:"속담", q:"적당한 것이 없을 때 그와 비슷한 것으로 대신함", a:"꿩 대신 닭", d:"원래 원하던 것이 없을 때 비슷한 수준의 다른 것으로 대신함을 뜻합니다."},
+        {c:"속담", q:"잘 아는 일이라도 세심하게 주의를 기울여야 함", a:"돌다리도 두들겨 보고 건너라", d:"확실하고 잘 아는 일도 실수 없도록 꼼꼼하게 다시 확인하라는 지혜입니다."},
+        {c:"속담", q:"가까운 곳에서 일어난 일을 오히려 모를 때", a:"등잔 밑이 어둡다", d:"정작 자신과 가장 가까운 곳에서 벌어지는 일을 모르는 상황을 비유합니다."},
+        {c:"속담", q:"매우 하기 쉬운 일을 비유하는 말", a:"땅 짚고 헤엄치기", d:"이미 성공이 보장되어 있거나 너무나 쉬워서 실패할 리 없는 일입니다."},
+        {c:"속담", q:"뜻밖에 당하는 불행이나 사고", a:"마른하늘에 날벼락", d:"전혀 예상하지 못한 상황에서 갑자기 닥친 큰 불행을 뜻합니다."},
+        {c:"속담", q:"어차피 당할 일이라면 남보다 먼저 당하는 것이 나음", a:"매도 먼저 맞는 게 낫다", d:"피할 수 없는 어려운 일이라면 일찍 겪는 게 마음 편하다는 뜻입니다."},
+        {c:"속담", q:"작은 나쁜 짓도 자꾸 하면 큰 죄를 짓게 됨", a:"바늘 도둑이 소 도둑 된다", d:"작은 잘못을 가볍게 여기면 나중에 큰 범죄를 저지를 수 있다는 경고입니다."},
+        {c:"속담", q:"주가 되는 것보다 부차적인 것이 더 크거나 많음", a:"배보다 배꼽이 더 크다", d:"기본적인 것보다 부수적인 수고가 더 많이 들어가는 상황을 말합니다."},
+        {c:"속담", q:"매우 하기 쉬운 일을 이르는 말", a:"식은 죽 먹기", d:"아무런 노력 없이도 쉽게 해낼 수 있는 일을 뜻합니다."},
+        {c:"속담", q:"원인이 없으면 결과가 있을 수 없다는 뜻", a:"아니 땐 굴뚝에 연기 날까", d:"결과가 생기는 데에는 반드시 그럴만한 이유가 있음을 뜻합니다."},
+        {c:"속담", q:"걱정하던 일이 해결되어 아주 시원한 상태", a:"앓던 이가 빠진 것 같다", d:"오랫동안 괴롭히던 고민거리가 해결되어 아주 후련할 때 씁니다."},
+        {c:"속담", q:"못난 사람이 자기 편의 명예를 더럽힘", a:"어물전 망신은 꼴뚜기가 시킨다", d:"집단 내 질이 떨어지는 사람이 전체의 체면을 깎아내리는 상황입니다."},
+        {c:"속담", q:"아무리 어려운 일이라도 정성을 다하면 이루어짐", a:"열 번 찍어 안 넘어가는 나무 없다", d:"꾸준히 노력하면 아무리 어려운 목표라도 결국 달성할 수 있다는 뜻입니다."},
+        {c:"속담", q:"안 될 일은 아예 처음부터 바라지도 말라는 뜻", a:"오르지 못할 나무는 쳐다보지도 마라", d:"자기 능력 밖의 일에 지나친 욕심을 내지 말고 분수를 지키라는 교훈입니다."},
+        {c:"속담", q:"세상 형편을 넓게 알지 못하는 사람", a:"우물 안 개구리", d:"좁은 범위 안에서만 생각하며 넓은 세상의 변화를 모르는 사람입니다."},
+        {c:"속담", q:"좋게 대하는 사람에게는 나쁘게 대할 수 없음", a:"웃는 낯에 침 못 뱉는다", d:"상대방이 나에게 친절하게 대하면 화를 내기 어렵다는 뜻입니다."},
+        {c:"속담", q:"익숙한 일이라도 실수할 때가 있다는 뜻", a:"원숭이도 나무에서 떨어진다", d:"아무리 실력이 뛰어난 전문가라도 가끔은 실수할 수 있음을 뜻합니다."},
+        {c:"속담", q:"윗물이 맑아야 아랫물이 맑다", a:"윗물이 맑아야 아랫물이 맑다", d:"윗사람이 바른 행동을 해야 아랫사람도 본받는다는 사회적 교훈입니다."},
+        {c:"속담", q:"한 번 놀란 일과 비슷한 것만 봐도 겁을 냄", a:"자라 보고 놀란 가슴 솥뚜껑 보고 놀란다", d:"어떤 일에 크게 놀란 적이 있는 사람은 비슷한 것만 봐도 겁을 먹게 됩니다."},
+        {c:"속담", q:"몸집은 작아도 재주가 뛰어나거나 힘이 센 사람", a:"작은 고추가 맵다", d:"겉으로 보기엔 작고 약해 보여도 실제로는 아주 야무진 경우를 뜻합니다."},
+        {c:"속담", q:"엉뚱한 곳에서 화풀이를 함을 이르는 말", a:"종로에서 뺨 맞고 한강에서 눈 흘긴다", d:"자기가 해를 입은 곳에서는 말 못 하다 엉뚱한 곳에서 화풀이하는 상황입니다."},
+        {c:"속담", q:"무슨 일이든 시작이 중요하다는 뜻", a:"천 리 길도 한 걸음부터", d:"아무리 큰 계획이라도 당장 눈앞의 작은 첫걸음부터 시작된다는 뜻입니다."},
+        {c:"속담", q:"무식해서 용감하거나 철없이 행동함", a:"하룻강아지 범 무서운 줄 모른다", d:"세상 물정을 모르고 무서운 대상을 몰라봐 무모하게 덤비는 사람을 뜻합니다."},
+        {c:"속담", q:"아무리 큰 어려움에 처해도 살아날 길은 있음", a:"하늘이 무너져도 솟아날 구멍이 있다", d:"절망적인 상황에서도 포기하지 않으면 해결책이 보인다는 격려입니다."},
+        {c:"속담", q:"매우 쉽고 편안하게 할 수 있는 일", a:"누워서 떡 먹기", d:"힘을 들이지 않고 거저 얻는 수준의 아주 쉬운 일을 뜻합니다."},
+        {c:"속담", q:"마음먹었을 때 망설이지 말고 바로 행동함", a:"쇠뿔도 단김에 빼라", d:"좋은 기회가 왔을 때 미루지 말고 즉시 처리해야 성공 확률이 높다는 뜻입니다."},
+        {c:"속담", q:"해줄 사람은 생각도 않는데 미리 기대함", a:"떡 줄 사람은 생각도 않는데 김칫국부터 마신다", d:"상대방의 의중도 모르면서 혼자 성급한 기대를 하는 상황을 비유합니다."},
+        {c:"속담", q:"나쁜 일을 오래 하면 결국 들키게 됨", a:"꼬리가 길면 밟힌다", d:"나쁜 행동을 반복하다 보면 결국에는 정체가 탄로 나게 되어 있다는 경고입니다."},
+        {c:"속담", q:"아무리 좋은 구경이라도 배가 불러야 즐거움", a:"금강산도 식후경", d:"아름다운 경치 구경도 일단 배가 불러야 즐길 여유가 생긴다는 뜻입니다."},
+        {c:"속담", q:"보기에는 좋아도 가질 수 없거나 이용할 수 없음", a:"그림의 떡", d:"탐은 나지만 내 능력으로 얻을 수 없는 대상을 뜻합니다."},
+        {c:"속담", q:"강한 자들 싸움에 상관 없는 약자가 피해를 봄", a:"고래 싸움에 새우 등 터진다", d:"강자들의 다툼 사이에서 아무 잘못 없는 약자가 희생되는 상황입니다."},
+        {c:"속담", q:"정성을 다해 만든 것은 쉽게 무너지지 않음", a:"공든 탑이 무너지랴", d:"노력과 정성을 쏟은 일은 결코 헛수고로 돌아가지 않는다는 확신입니다."},
+        {c:"속담", q:"가장 기본적인 것도 모를 정도로 무식함", a:"낫 놓고 기역자도 모른다", d:"눈앞에 도구를 두고도 기본 글자 모양을 모를 만큼 무식한 상태입니다."},
+        {c:"속담", q:"남을 해치려다가 결국 자기가 해를 입음", a:"누워서 침 뱉기", d:"남을 헐뜯는 행위는 결국 자신에게 손해가 되어 돌아온다는 교훈입니다."},
+        {c:"속담", q:"자기 이익만 챙기고 불리하면 모른 척함", a:"달면 삼키고 쓰면 뱉는다", d:"의리나 원칙 없이 오직 자신의 이익에 따라서만 행동하는 태도입니다."},
+        {c:"속담", q:"애써 하던 일이 실패하여 헛수고가 됨", a:"닭 쫓던 개 지붕 쳐다본다", d:"공들여 쫓던 목표를 놓치고 허탈하게 바라보는 난처한 상황을 뜻합니다."},
+        {c:"속담", q:"죄를 지은 사람은 마음이 불안해 스스로 나타남", a:"도둑이 제 발 저린다", d:"나쁜 짓을 한 사람은 누가 뭐라고 하지 않아도 스스로 찔려서 표가 나게 됩니다."},
+        {c:"속담", q:"장래에 크게 될 사람은 어릴 때부터 남다름", a:"될성부른 나무는 떡잎부터 알아본다", d:"성공할 재목은 어린 시절부터 그 태도가 범상치 않음을 뜻합니다."},
+        {c:"속담", q:"자기가 필요할 때와 아닐 때 마음이 다름", a:"뒷간에 갈 적 마음 다르고 올 적 마음 다르다", d:"사람의 이기적인 마음 변화를 화장실 이용 전후에 비유한 말입니다."},
+        {c:"속담", q:"매우 빨리 먹거나 일을 순식간에 끝냄", a:"마파람에 게 눈 감추듯", d:"음식을 아주 빨리 먹어 치우는 모양을 생생하게 표현한 말입니다."},
+        {c:"속담", q:"아무리 노력해도 보람 없이 헛수고함", a:"밑 빠진 독에 물 붓기", d:"근본 문제가 해결되지 않아 노력을 쏟아부어도 끝이 없는 헛수고입니다."},
+        {c:"속담", q:"말은 순식간에 멀리 퍼지니 조심해야 함", a:"발 없는 말이 천 리 간다", d:"말은 사람 입을 타고 순식간에 널리 퍼지니 항상 조심하라는 경고입니다."},
+        {c:"속담", q:"욕심이 너무 많아 아주 작은 것까지 착취함", a:"벼룩의 간을 내어 먹는다", d:"매우 약한 처지에 있는 사람의 아주 작은 것까지 빼앗는 가혹한 욕심입니다."},
+        {c:"속담", q:"그 분야에 오래 있으면 저절로 지식이 생김", a:"서당 개 삼 년이면 풍월을 읊는다", d:"어떤 환경에 오래 머물다 보면 저절로 그 분야의 지식을 습득하게 됨입니다."},
+
+        // 관용구 30개
+        {c:"관용구", q:"아는 사람이 많고 활동 범위가 넓다", a:"발이 넓다", d:"사교성이 좋아 여러 사람과 관계를 맺고 있음을 뜻합니다."},
+        {c:"관용구", q:"기세가 꺾이거나 무안을 당하다", a:"코가 납작해지다", d:"잘난 체하다가 무안을 당해 기가 죽은 상태를 표현합니다."},
+        {c:"관용구", q:"기준이 까다롭거나 눈썰미가 좋다", a:"눈이 높다", d:"자신의 실력보다 훨씬 좋은 것만 바라거나 대상을 고르는 기준이 높음입니다."},
+        {c:"관용구", q:"음식을 가려 먹거나 조금 먹다", a:"입이 짧다", d:"편식이 심하거나 식사량이 적어 음식을 즐기지 않는 성향입니다."},
+        {c:"관용구", q:"남의 말을 쉽게 믿거나 잘 속다", a:"귀가 얇다", d:"주관이 뚜렷하지 않아 남의 말에 쉽게 휘둘리는 태도입니다."},
+        {c:"관용구", q:"나쁜 일을 그만두다", a:"손을 씻다", d:"부정적인 일이나 나쁜 습관을 완전히 끊고 정리한다는 뜻입니다."},
+        {c:"관용구", q:"적극적으로 나서서 돕다", a:"발을 벗고 나서다", d:"신발을 벗고 뛰어들 만큼 아주 적극적으로 돕는 모습입니다."},
+        {c:"관용구", q:"의아해하거나 의심스러워하다", a:"고개를 갸우뚱하다", d:"어떤 일이 이해가 안 되거나 의심스러울 때의 동작에서 온 말입니다."},
+        {c:"관용구", q:"잘못을 모른 척하고 넘어가 주다", a:"눈을 감아 주다", d:"남의 허물이나 가벼운 실수를 보고도 처벌하지 않고 넘어가 줌입니다."},
+        {c:"관용구", q:"남이 잘되어 샘이 나고 질투하다", a:"배가 아프다", d:"가까운 이의 성공을 질투하는 마음을 나타냅니다."},
+        {c:"관용구", q:"책임이 크거나 부담이 되다", a:"어깨가 무겁다", d:"감당해야 할 임무나 책임이 매우 크다는 부담감을 나타냅니다."},
+        {c:"관용구", q:"말의 내용을 하나로 통일하다", a:"입을 맞추다", d:"서로 다른 이야기를 하지 않도록 답변 내용을 똑같이 맞추는 행위입니다."},
+        {c:"관용구", q:"잘난 체하며 거만하게 굴다", a:"콧대가 높다", d:"자존심이 매우 강하거나 남을 무시하며 거만하게 구는 태도입니다."},
+        {c:"관용구", q:"감동을 느끼다", a:"가슴이 찡하다", d:"감동적인 장면을 보았을 때 마음속 깊이 울림이 오는 감정입니다."},
+        {c:"관용구", q:"결혼식에 가다", a:"국수를 먹다", d:"결혼 잔치에서 국수를 대접하던 관습에서 유래했습니다."},
+        {c:"관용구", q:"몹시 탐내다", a:"눈독을 들이다", d:"무언가를 가지고 싶어 욕심 어린 눈으로 계속 지켜보는 모습입니다."},
+        {c:"관용구", q:"어떤 일에 방해가 되다", a:"발목을 잡다", d:"앞으로 나아가려는 사람을 방해하거나 지장을 주는 상황입니다."},
+        {c:"관용구", q:"마음이나 의견이 잘 통하다", a:"손발이 맞다", d:"함께 일을 할 때 호흡이 척척 맞고 협동이 잘 되는 상태입니다."},
+        {c:"관용구", q:"비밀을 잘 지키다", a:"입이 무겁다", d:"말이 신중하고 남의 비밀을 함부로 누설하지 않는 태도입니다."},
+        {c:"관용구", q:"좋은 분위기를 망치다", a:"찬물을 끼얹다", d:"화기애애한 상황에서 분위기를 싸늘하게 만드는 말이나 행동입니다."},
+        {c:"관용구", q:"남이 하는 일에 더 심하게 행동하다", a:"한술 더 뜨다", d:"남이 하는 행동에 맞춰 더 심하거나 대담한 행동을 덧붙이는 태도입니다."},
+        {c:"관용구", q:"몹시 놀라거나 겁이 나다", a:"간이 콩알만 해지다", d:"너무 무섭거나 당황해서 공포심을 느낄 때의 비유입니다."},
+        {c:"관용구", q:"부끄러움을 모르다", a:"얼굴이 두껍다", d:"뻔뻔해서 잘못을 저지르고도 미안해하는 기색이 전혀 없는 상태입니다."},
+        {c:"관용구", q:"남을 지나치게 칭찬하다", a:"비행기를 태우다", d:"상대방을 너무 높여 주어 기분 좋게 만드는 과한 칭찬입니다."},
+        {c:"관용구", q:"약속 상대가 나타나지 않다", a:"바람을 맞다", d:"약속 장소에서 상대방을 기다리다 헛수고를 한 상황입니다."},
+        {c:"관용구", q:"몹시 답답하거나 후회스러워하다", a:"가슴을 치다", d:"너무 억울하거나 답답해서 한탄스러운 심정을 나타낸 말입니다."},
+        {c:"관용구", q:"일이 복잡해서 머리가 아프다", a:"골치가 아프다", d:"문제가 꼬여서 해결하기 힘들고 신경 쓰이는 상황입니다."},
+        {c:"관용구", q:"정신없이 몹시 바쁘다", a:"눈코 뜰 새 없다", d:"시간적 여유가 전혀 없을 만큼 아주 바쁜 상황을 뜻합니다."},
+        {c:"관용구", q:"본 적이 있는 것 같다", a:"낯이 익다", d:"처음 보는 사람이 아니라 어디선가 본 듯 얼굴이 익숙함입니다."},
+        {c:"관용구", q:"위험하거나 힘든 일을 피하려고 조심하다", a:"몸을 사리다", d:"적극적으로 나서지 않고 자신의 안위만을 위해 조심하는 태도입니다."},
+
+        // 고사성어 20개
+        {c:"고사성어", q:"돌 하나로 새 두 마리를 잡음", a:"일석이조", d:"한 가지 일로 동시에 두 가지 이득을 얻는 상황을 뜻합니다."},
+        {c:"고사성어", q:"결심이 사흘을 가지 못함", a:"작심삼일", d:"굳게 마음먹었으나 의지가 약해 금방 포기함을 뜻합니다."},
+        {c:"고사성어", q:"묻는 말에 엉뚱하게 대답함", a:"동문서답", d:"질문의 요지를 파악하지 못하고 엉뚱한 딴소리를 하는 상황입니다."},
+        {c:"고사성어", q:"많으면 많을수록 좋음", a:"다다익선", d:"자원이나 인력은 많을수록 유리하다는 뜻입니다."},
+        {c:"고사성어", q:"말을 안 해도 마음이 통함", a:"이심전심", d:"설명하지 않아도 서로의 생각이나 느낌이 일치할 때 씁니다."},
+        {c:"고사성어", q:"미리 준비하면 걱정이 없음", a:"유비무환", d:"평소에 철저히 대비해두면 나중에 걱정할 것이 없다는 지혜입니다."},
+        {c:"고사성어", q:"어릴 때부터 같이 놀며 자란 친구", a:"죽마고우", d:"어릴 시절부터의 단짝 친구를 뜻하며 오랜 우정을 상징합니다."},
+        {c:"고사성어", q:"가을 하늘이 높고 말이 살찜", a:"천고마비", d:"활동하기 좋고 풍요로운 가을철을 의미합니다."},
+        {c:"고사성어", q:"아무리 가르쳐도 알아듣지 못함", a:"우이독경", d:"아무리 말해주어도 전혀 귀담아듣지 않는 태도를 비판합니다."},
+        {c:"고사성어", q:"아무의 도움도 받을 수 없는 외로운 상태", a:"사면초가", d:"사방이 적에게 둘러싸여 고립된 절망적인 위기를 뜻합니다."},
+        {c:"고사성어", q:"어려운 일이 겹쳐서 일어남", a:"설상가상", d:"이미 나쁜 상황에 더 안 좋은 일이 계속 꼬이는 상황입니다."},
+        {c:"고사성어", q:"화가 바뀌어 복이 됨", a:"전화위복", d:"불행으로 보였던 일이 나중에 좋은 기회가 됨을 의미합니다."},
+        {c:"고사성어", q:"눈앞의 차이만 알고 결과가 같음을 모름", a:"조삼모사", d:"얕은수로 남을 속이거나 눈앞의 이익에 연연함을 뜻합니다."},
+        {c:"고사성어", q:"바쁘게 대충 훑어봄", a:"주마간산", d:"사물의 겉모습만 수박 겉앓기 식으로 보고 지나침을 뜻합니다."},
+        {c:"고사성어", q:"고생 끝에 즐거움이 옴", a:"고진감래", d:"힘든 고난의 시간을 견뎌내면 반드시 즐거운 결과가 찾아온다는 뜻입니다."},
+        {c:"고사성어", q:"무엇이든 다 잘하는 사람", a:"팔방미인", d:"다방면에 재능이 많아 모든 일을 능숙하게 처리하는 사람입니다."},
+        {c:"고사성어", q:"죽을 고비에서 겨우 살아남", a:"구사일생", d:"아주 위험한 고비를 넘기고 기적적으로 생명을 건진 상황입니다."},
+        {c:"고사성어", q:"처지가 비슷한 사람끼리 서로 동정함", a:"동병상련", d:"같은 아픔을 겪는 이들이 서로를 가장 잘 이해한다는 뜻입니다."},
+        {c:"고사성어", q:"큰 사람은 늦게 성공함", a:"대기만성", d:"큰 인물이 되기 위해서는 꾸준한 노력과 시간이 필요함을 뜻합니다."},
+        {c:"고사성어", q:"모든 일은 반드시 바른길로 돌아감", a:"사필귀정", d:"세상의 모든 일은 결국 반드시 바른 이치로 돌아가게 된다는 뜻입니다."}
+    ];
+
+    const app = {
+        state: { name: "", idx: 0, score: 0, answered: false, questions: [], wrongPool: [], completedList: [], mode: "normal", lastNormalIdx: 0 },
+        
+        init: function(mode) {
+            const nameInput = document.getElementById('user-name').value.trim();
+            if(!nameInput) return alert("이름을 입력해주세요!");
+            this.state.name = nameInput;
+
+            const saved = localStorage.getItem(`vocab_v13_${nameInput}`);
+            if(saved) {
+                const data = JSON.parse(saved);
+                this.state.wrongPool = data.wrongPool || [];
+                this.state.completedList = data.completedList || [];
+                this.state.score = data.score || 0;
+            }
+
+            if(mode === 'review') {
+                if(this.state.wrongPool.length === 0) return alert("틀린 문제가 없습니다!");
+                this.state.questions = this.shuffle([...this.state.wrongPool]);
+                this.state.mode = 'review';
+                this.state.idx = 0;
+                this.setupScreen('review');
+            } else {
+                const remaining = database.filter(item => !this.state.completedList.includes(item.a));
+                
+                if (this.state.completedList.length > 0 && remaining.length > 0) {
+                    if(!confirm(`${nameInput}님, 지난 학습을 이어서 할까요?`)) {
+                        this.state.completedList = [];
+                        this.state.score = 0;
+                        this.state.questions = this.shuffle([...database]);
+                    } else {
+                        this.state.questions = this.shuffle(remaining);
+                    }
+                } else if (remaining.length === 0) {
+                    if(confirm("모든 문제를 다 풀었습니다! 처음부터 다시 할까요?")) {
+                        this.state.completedList = [];
+                        this.state.score = 0;
+                        this.state.questions = this.shuffle([...database]);
+                    } else return;
+                } else {
+                    this.state.questions = this.shuffle([...database]);
+                }
+
+                this.state.mode = 'normal';
+                this.state.idx = 0;
+                this.setupScreen('normal');
+            }
+
+            this.showScreen('screen-quiz');
+            document.getElementById('user-tag').innerText = `${this.state.name}님`;
+            this.render();
+        },
+
+        setupScreen: function(mode) {
+            const controls = document.getElementById('quiz-controls');
+            controls.classList.remove('hidden');
+            
+            if(mode === 'review') {
+                document.getElementById('review-tag').classList.remove('hidden');
+                document.getElementById('btn-to-review').classList.add('hidden');
+                document.getElementById('btn-exit-review').classList.remove('hidden');
+            } else {
+                document.getElementById('review-tag').classList.add('hidden');
+                document.getElementById('btn-to-review').classList.remove('hidden');
+                document.getElementById('btn-exit-review').classList.add('hidden');
+            }
+        },
+
+        render: function() {
+            const q = this.state.questions[this.state.idx];
+            this.state.answered = false;
+            
+            let solvedCount, remainingCount, totalCount;
+            if (this.state.mode === 'normal') {
+                totalCount = database.length; 
+                solvedCount = this.state.completedList.length;
+                remainingCount = totalCount - solvedCount;
+            } else {
+                totalCount = this.state.questions.length + this.state.idx;
+                solvedCount = this.state.idx;
+                remainingCount = this.state.questions.length - this.state.idx;
+            }
+
+            document.getElementById('progress-text-solved').innerText = `완료: ${solvedCount}개`;
+            document.getElementById('progress-text-remain').innerText = `남음: ${remainingCount}개`;
+            const percent = (solvedCount / 100) * 100; 
+            document.getElementById('progress-bar-fill').style.width = `${percent}%`;
+
+            document.getElementById('q-cat').innerText = q.c;
+            document.getElementById('q-text').innerText = q.q;
+            document.getElementById('next-btn').classList.add('hidden');
+            
+            const optCont = document.getElementById('options');
+            optCont.innerHTML = '';
+            
+            const options = this.shuffle([q.a, ...this.getWrongOptions(q.a)]);
+            
+            options.forEach((txt, i) => {
+                const item = document.createElement('div');
+                item.className = 'option-item';
+                item.innerHTML = `<strong>${String.fromCharCode(65 + i)}.</strong> ${txt}`;
+                item.dataset.val = txt;
+                item.onclick = () => this.check(item, txt, q);
+                optCont.appendChild(item);
+            });
+        },
+
+        getWrongOptions: function(correct) {
+            return this.shuffle(database.filter(d => d.a !== correct).map(d => d.a)).slice(0, 3);
+        },
+
+        check: function(selectedEl, selectedVal, currentQ) {
+            if(this.state.answered) return;
+            this.state.answered = true;
+            
+            const isCorrect = selectedVal === currentQ.a;
+            
+            if(isCorrect) {
+                if(this.state.mode === 'normal') {
+                    this.state.score++;
+                    this.state.completedList.push(currentQ.a);
+                } else {
+                    this.state.wrongPool = this.state.wrongPool.filter(item => item.a !== currentQ.a);
+                }
+            } else {
+                if(this.state.mode === 'normal') {
+                    this.state.completedList.push(currentQ.a);
+                    if(!this.state.wrongPool.some(item => item.a === currentQ.a)) {
+                        this.state.wrongPool.push(currentQ);
+                    }
+                }
+            }
+            
+            document.querySelectorAll('.option-item').forEach(el => {
+                const val = el.dataset.val;
+                const data = database.find(item => item.a === val);
+                const isItemCorrect = val === currentQ.a;
+                const isItemSelected = el === selectedEl;
+
+                if (isItemCorrect) el.classList.add('correct');
+                else if (isItemSelected && !isCorrect) el.classList.add('wrong');
+                else el.classList.add('dimmed');
+
+                let feedbackHtml = `<div class="explanation-box">${data ? data.d : ""}</div>`;
+                if (isItemCorrect) feedbackHtml = `<div class="feedback-row"><span style="color:var(--success)">✓ 정답</span></div>` + feedbackHtml;
+                else if (isItemSelected) feedbackHtml = `<div class="feedback-row"><span style="color:var(--danger)">× 오답</span></div>` + feedbackHtml;
+                
+                el.innerHTML += feedbackHtml;
+            });
+            document.getElementById('next-btn').classList.remove('hidden');
+            this.save();
+        },
+
+        endStudy: function() {
+            if(confirm("학습을 여기서 그만하고 결과를 볼까요?")) {
+                this.result(true); // 수동 종료 플래그
+            }
+        },
+
+        switchToReview: function() {
+            if(this.state.wrongPool.length === 0) return alert("복습할 오답이 없습니다!");
+            if(confirm("오답 복습 모드로 전환할까요?")) {
+                this.state.lastNormalIdx = this.state.idx; 
+                this.init('review');
+            }
+        },
+
+        exitReview: function() {
+            if(confirm("복습을 마치고 원래 학습으로 돌아가시겠습니까?")) {
+                this.init('normal');
+            }
+        },
+
+        next: function() {
+            this.state.idx++;
+            if (this.state.mode === 'review' && this.state.idx >= this.state.questions.length) {
+                alert("🎉 오답을 모두 해결했습니다!\n원래 학습으로 돌아갑니다.");
+                this.init('normal');
+                return;
+            }
+
+            if(this.state.idx < this.state.questions.length) this.render(); else this.result();
+        },
+
+        result: function(isManualEnd = false) {
+            this.showScreen('screen-result');
+            
+            const reviewBtn = document.getElementById('review-btn-result');
+            
+            if (isManualEnd) {
+                document.getElementById('result-title').innerText = "학습 종료";
+                document.getElementById('final-score').innerText = `${this.state.completedList.length} / 100`;
+                document.getElementById('result-msg').innerText = "오늘 학습을 마쳤습니다.";
+                reviewBtn.classList.add('hidden'); // 수동 종료 시 복습 버튼 숨김
+            } else {
+                if(this.state.mode === 'normal') {
+                    document.getElementById('result-title').innerText = "완주 성공!";
+                    document.getElementById('final-score').innerText = `${this.state.score} / 100`;
+                    document.getElementById('result-msg').innerText = "모든 문제를 다 풀었습니다.";
+                } else {
+                    document.getElementById('result-title').innerText = "복습 완료";
+                    document.getElementById('final-score').innerText = "";
+                    document.getElementById('result-msg').innerText = `남은 오답이 없습니다!`;
+                }
+
+                if(this.state.wrongPool.length > 0) reviewBtn.classList.remove('hidden');
+                else reviewBtn.classList.add('hidden');
+            }
+        },
+
+        save: function() {
+            localStorage.setItem(`vocab_v13_${this.state.name}`, JSON.stringify({
+                wrongPool: this.state.wrongPool,
+                completedList: this.state.completedList,
+                score: this.state.score
+            }));
+            this.updateBadges();
+        },
+
+        updateBadges: function() {
+            const count = this.state.wrongPool.length;
+            const badge = document.getElementById('start-badge');
+            const btn = document.getElementById('review-btn-start');
+            if(count > 0) {
+                badge.innerText = count;
+                btn.classList.remove('hidden');
+            } else {
+                btn.classList.add('hidden');
+            }
+        },
+
+        showScreen: function(id) {
+            ['screen-start', 'screen-quiz', 'screen-result'].forEach(s => document.getElementById(s).classList.add('hidden'));
+            document.getElementById(id).classList.remove('hidden');
+            
+            if (id === 'screen-quiz') {
+                document.getElementById('quiz-controls').classList.remove('hidden');
+            } else {
+                document.getElementById('quiz-controls').classList.add('hidden');
+            }
+        },
+
+        shuffle: function(arr) { return arr.sort(() => Math.random() - 0.5); }
+    };
+
+    document.getElementById('theme-checkbox').addEventListener('change', (e) => {
+        document.documentElement.setAttribute('data-theme', e.target.checked ? 'dark' : 'light');
+    });
+
+    window.onload = () => {
+        const nameInput = document.getElementById('user-name');
+        nameInput.oninput = () => {
+            const saved = localStorage.getItem(`vocab_v13_${nameInput.value.trim()}`);
+            if(saved) {
+                const data = JSON.parse(saved);
+                if(data.wrongPool && data.wrongPool.length > 0) {
+                    document.getElementById('review-btn-start').classList.remove('hidden');
+                    document.getElementById('start-badge').innerText = data.wrongPool.length;
+                }
+            } else { document.getElementById('review-btn-start').classList.add('hidden'); }
+        };
+    };
+</script>
+</body>
+</html>
