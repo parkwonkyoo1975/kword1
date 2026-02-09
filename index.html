@@ -16,15 +16,6 @@
             --success: #2ecc71;
             --danger: #ff6b6b;
         }
-        [data-theme='dark'] {
-            --bg-color: #121212;
-            --card-bg: #1e1e1e;
-            --primary: #5da2ff;
-            --text-main: #ffffff;
-            --text-sub: #bbbbbb;
-            --option-bg: #252525;
-            --option-border: #333333;
-        }
         
         body {
             font-family: 'Pretendard', sans-serif;
@@ -36,9 +27,10 @@
             align-items: center;
             min-height: 100vh;
             transition: 0.3s;
+            overflow-x: hidden;
         }
 
-        /* [기본 모바일 설정] */
+        /* [기본] 모바일용 설정 */
         .container {
             width: 100%;
             max-width: 500px;
@@ -47,54 +39,57 @@
             position: relative;
             transition: all 0.3s ease;
         }
+        .main-title { font-size: 2.2rem; font-weight: 800; color: var(--primary); margin-bottom: 10px; }
+        .question-box { font-size: 1.35rem; font-weight: 600; line-height: 1.6; margin-bottom: 30px; text-align: left; min-height: 60px; word-break: keep-all; }
+        .option-item { font-size: 1rem; padding: 20px; background: var(--option-bg); border: 2px solid var(--option-border); border-radius: 16px; cursor: pointer; transition: all 0.2s; text-align: left; }
+        .explanation-box { font-size: 0.95rem; color: var(--text-sub); margin-top: 10px; line-height: 1.6; border-top: 1px solid var(--option-border); padding-top: 10px; word-break: keep-all; }
+        .footer-btn { 
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); 
+            width: calc(100% - 40px); max-width: 460px; padding: 20px; 
+            border-radius: 50px; border: none; background: var(--primary); color: white; 
+            font-weight: bold; font-size: 1.2rem; cursor: pointer; 
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2); z-index: 100;
+            transition: max-width 0.3s ease, width 0.3s ease;
+        }
 
-        /* [핵심] 크롬북/PC/태블릿용 대화면 설정 (화면 폭 800px 이상일 때) */
+        /* [확대] 크롬북/PC/태블릿용 설정 (800px 이상) */
         @media (min-width: 800px) {
-            .container { 
-                max-width: 900px !important; /* 전체 폭을 900px까지 확대 */
-            }
-            .card {
-                padding: 60px 50px !important; /* 카드 내부 여백 확대 */
-                border-radius: 30px !important;
-            }
-            /* 글자 크기 대폭 확대 */
+            .container { max-width: 900px !important; }
+            .card { padding: 60px 50px !important; border-radius: 30px !important; }
             .main-title { font-size: 4rem !important; margin-bottom: 30px !important; }
             .question-box { font-size: 2.2rem !important; margin-bottom: 50px !important; line-height: 1.5 !important; }
             .option-item { font-size: 1.5rem !important; padding: 25px !important; border-radius: 20px !important; }
             .explanation-box { font-size: 1.3rem !important; margin-top: 15px !important; }
-            
-            /* 버튼 및 기타 UI 확대 */
-            .footer-btn { 
-                max-width: 800px !important; 
-                font-size: 1.8rem !important; 
-                padding: 25px !important; 
-                border-radius: 60px !important;
-            }
-            .header-btn {
-                font-size: 1.2rem !important;
-                padding: 12px 20px !important;
-            }
+            .footer-btn { max-width: 800px !important; font-size: 1.8rem !important; padding: 25px !important; border-radius: 60px !important; }
+            .header-btn { font-size: 1.2rem !important; padding: 12px 20px !important; }
             .q-cat, .user-tag { font-size: 1.2rem !important; }
             .progress-info { font-size: 1.2rem !important; margin-top: 10px !important; }
-            .theme-switch { transform: scale(1.5); transform-origin: right center; } /* 스위치도 키움 */
-            
-            /* 보기 간격 넓힘 */
             .options-list { gap: 20px !important; }
+            
+            /* 줌 콤보박스 크기 조정 */
+            .zoom-select { font-size: 1.1rem !important; padding: 8px 15px !important; }
         }
 
         .hidden { display: none !important; }
 
+        /* 상단 바 */
         .top-bar { display: flex; justify-content: space-between; align-items: center; padding-bottom: 15px; }
         .header-btn { border: none; padding: 8px 12px; border-radius: 8px; font-size: 0.85rem; font-weight: bold; cursor: pointer; transition: 0.2s; }
         .btn-end { background: var(--text-sub); color: white; }
         .btn-review { background: var(--danger); color: white; margin-right: 5px; }
 
-        .theme-switch { display: inline-block; height: 24px; position: relative; width: 50px; }
-        .theme-switch input { display: none; }
-        .slider { background-color: #ccc; bottom: 0; cursor: pointer; left: 0; position: absolute; right: 0; top: 0; transition: .4s; border-radius: 34px; }
-        .slider:before { background-color: white; bottom: 4px; content: ""; height: 16px; left: 4px; position: absolute; transition: .4s; width: 16px; border-radius: 50%; }
-        input:checked + .slider { background-color: var(--primary); }
-        input:checked + .slider:before { transform: translateX(26px); }
+        /* 화면 배율 콤보 박스 */
+        .zoom-select {
+            padding: 5px 10px;
+            border-radius: 8px;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            font-weight: bold;
+            background: white;
+            outline: none;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
 
         .card { 
             background: var(--card-bg); padding: 40px 20px; 
@@ -103,62 +98,60 @@
             box-shadow: 0 15px 35px rgba(0,0,0,0.08); 
             margin-top: 0; 
         }
-        .main-title { font-size: 2.2rem; font-weight: 800; color: var(--primary); margin-bottom: 10px; word-break: keep-all; }
 
+        /* 퀴즈 UI */
         .quiz-header { margin-bottom: 20px; border-bottom: 1px solid var(--option-border); padding-bottom: 10px; }
         .info-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
         .q-cat { font-size: 0.8rem; background: var(--option-border); padding: 3px 8px; border-radius: 6px; font-weight: bold; }
         .user-tag { color: var(--text-sub); font-size: 0.9rem; }
         
         .progress-info { display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--text-sub); font-weight: bold; margin-top: 5px; }
-        .progress-bar-bg { width: 100%; height: 8px; background: var(--option-border); border-radius: 4px; margin-top: 5px; overflow: hidden; }
+        .progress-bar-bg { width: 100%; height: 6px; background: var(--option-border); border-radius: 3px; margin-top: 5px; overflow: hidden; }
         .progress-bar-fill { height: 100%; background: var(--primary); width: 0%; transition: 0.3s; }
-
-        .question-box { font-size: 1.35rem; font-weight: 600; line-height: 1.6; margin-bottom: 30px; text-align: left; min-height: 60px; word-break: keep-all; }
         
         .options-list { display: grid; gap: 12px; }
-        .option-item { background: var(--option-bg); border: 2px solid var(--option-border); border-radius: 16px; padding: 20px; cursor: pointer; transition: all 0.2s; text-align: left; font-size: 1rem; }
         .option-item.correct { border-color: var(--success) !important; background: rgba(46, 204, 113, 0.15); }
         .option-item.wrong { border-color: var(--danger) !important; background: rgba(255, 107, 107, 0.15); }
         .option-item.dimmed { opacity: 0.6; border-color: var(--option-border); }
         
         .feedback-row { display: flex; align-items: center; margin-top: 12px; font-weight: bold; }
-        .explanation-box { font-size: 0.95rem; color: var(--text-sub); margin-top: 10px; line-height: 1.6; border-top: 1px solid var(--option-border); padding-top: 10px; word-break: keep-all; }
 
         .quiz-content-area { padding-bottom: 140px; }
 
-        .footer-btn { 
-            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); 
-            width: calc(100% - 40px); max-width: 460px; 
-            padding: 20px; border-radius: 50px; border: none; 
-            background: var(--primary); color: white; font-weight: bold; font-size: 1.2rem; 
-            cursor: pointer; box-shadow: 0 5px 20px rgba(0,0,0,0.2); z-index: 100;
-            transition: all 0.3s ease;
-        }
         .sub-btn { background: var(--option-bg); border: 1px solid var(--option-border); color: var(--text-main); padding: 12px 25px; border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 10px; width: 80%; }
         .badge { background: var(--danger); color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.8rem; margin-left: 5px; }
     </style>
 </head>
 <body>
 
-<div class="container">
+<div class="container" id="app-container">
     <div class="top-bar">
         <div id="quiz-controls" class="hidden">
             <button class="header-btn btn-end" onclick="app.endStudy()">그만하기</button>
             <button id="btn-to-review" class="header-btn btn-review hidden" onclick="app.switchToReview()">오답 복습</button>
             <button id="btn-exit-review" class="header-btn btn-end hidden" onclick="app.exitReview()">복습 종료</button>
         </div>
+        
         <div style="flex-grow: 1;"></div>
-        <label class="theme-switch"><input type="checkbox" id="theme-checkbox"><div class="slider"></div></label>
+
+        <select id="zoom-select" class="zoom-select" onchange="app.setZoom(this.value)">
+            <option value="0.7">70%</option>
+            <option value="0.8">80%</option>
+            <option value="0.9">90%</option>
+            <option value="1" selected>100%</option>
+            <option value="1.1">110%</option>
+            <option value="1.2">120%</option>
+            <option value="1.3">130%</option>
+        </select>
     </div>
 
     <div id="screen-start" class="card">
         <div class="main-title">📚 어휘력 100</div>
         <p style="color: var(--text-sub);">속담, 관용구, 고사성어</p>
-        <input type="text" id="user-name" placeholder="이름을 입력하세요" style="width:80%; padding:15px; border-radius:10px; border:1px solid var(--option-border); background:var(--option-bg); color:var(--text-main); margin:20px 0; text-align:center; font-size: 1.1rem;">
+        <input type="text" id="user-name" placeholder="이름을 입력하세요" style="width:80%; padding:15px; border-radius:10px; border:1px solid var(--option-border); background:var(--option-bg); color:var(--text-main); margin:20px 0; text-align:center;">
         <br>
-        <button onclick="app.init('normal')" style="padding:15px 50px; border-radius:12px; border:none; background:var(--primary); color:white; font-weight:bold; cursor:pointer; width:80%; font-size: 1.1rem;">시작하기</button>
-        <button id="review-btn-start" class="sub-btn hidden" onclick="app.init('review')" style="margin-top:15px; font-size: 1rem;">오답 복습하기 <span id="start-badge" class="badge">0</span></button>
+        <button onclick="app.init('normal')" style="padding:15px 50px; border-radius:12px; border:none; background:var(--primary); color:white; font-weight:bold; cursor:pointer; width:80%;">시작하기</button>
+        <button id="review-btn-start" class="sub-btn hidden" onclick="app.init('review')" style="margin-top:15px;">오답 복습하기 <span id="start-badge" class="badge">0</span></button>
     </div>
 
     <div id="screen-quiz" class="hidden quiz-content-area">
@@ -185,10 +178,10 @@
     <div id="screen-result" class="card hidden">
         <h1 id="result-title" style="color:var(--success);">수고했어요!</h1>
         <div style="font-size:3rem; font-weight:900; margin: 20px 0;" id="final-score">0 / 100</div>
-        <p id="result-msg" style="margin-bottom:30px; color:var(--text-sub); line-height:1.6; font-size: 1.1rem;"></p>
+        <p id="result-msg" style="margin-bottom:30px; color:var(--text-sub); line-height:1.6;"></p>
         
-        <button id="review-btn-result" class="sub-btn hidden" onclick="app.init('review')" style="background:var(--danger); color:white; border:none; margin-bottom:10px; width:100%; font-size: 1.1rem;">틀린 문제 복습하기</button>
-        <button onclick="location.reload()" style="width:80%; padding:12px; border-radius:10px; border:none; background:var(--primary); color:white; font-weight:bold; cursor:pointer; font-size: 1.1rem;">처음으로</button>
+        <button id="review-btn-result" class="sub-btn hidden" onclick="app.init('review')" style="background:var(--danger); color:white; border:none; margin-bottom:10px; width:100%;">틀린 문제 복습하기</button>
+        <button onclick="location.reload()" style="width:80%; padding:12px; border-radius:10px; border:none; background:var(--primary); color:white; font-weight:bold; cursor:pointer;">처음으로</button>
     </div>
 </div>
 
@@ -244,7 +237,7 @@
         {c:"속담", q:"매우 빨리 먹거나 일을 순식간에 끝냄", a:"마파람에 게 눈 감추듯", d:"음식을 아주 빨리 먹어 치우는 모양을 생생하게 표현한 말입니다."},
         {c:"속담", q:"아무리 노력해도 보람 없이 헛수고함", a:"밑 빠진 독에 물 붓기", d:"근본 문제가 해결되지 않아 노력을 쏟아부어도 끝이 없는 헛수고입니다."},
         {c:"속담", q:"말은 순식간에 멀리 퍼지니 조심해야 함", a:"발 없는 말이 천 리 간다", d:"말은 사람 입을 타고 순식간에 널리 퍼지니 항상 조심하라는 경고입니다."},
-        {c:"속담", q:"욕심이 너무 많아 아주 작은 것까지 착취함", a:"벼룩의 간을 내어 먹는다", d:"약한 처지에 있는 사람의 아주 작은 것까지 빼앗는 가혹한 욕심입니다."},
+        {c:"속담", q:"욕심이 너무 많아 아주 작은 것까지 착취함", a:"벼룩의 간을 내어 먹는다", d:"매우 약한 처지에 있는 사람의 아주 작은 것까지 빼앗는 가혹한 욕심입니다."},
         {c:"속담", q:"그 분야에 오래 있으면 저절로 지식이 생김", a:"서당 개 삼 년이면 풍월을 읊는다", d:"어떤 환경에 오래 머물다 보면 저절로 그 분야의 지식을 습득하게 됨입니다."},
 
         // 관용구 30개
@@ -310,7 +303,7 @@
             if(!nameInput) return alert("이름을 입력해주세요!");
             this.state.name = nameInput;
 
-            const saved = localStorage.getItem(`vocab_v17_${nameInput}`);
+            const saved = localStorage.getItem(`vocab_v19_${nameInput}`);
             if(saved) {
                 const data = JSON.parse(saved);
                 this.state.wrongPool = data.wrongPool || [];
@@ -353,6 +346,10 @@
             this.showScreen('screen-quiz');
             document.getElementById('user-tag').innerText = `${this.state.name}님`;
             this.render();
+        },
+
+        setZoom: function(val) {
+            document.body.style.zoom = val;
         },
 
         setupScreen: function(mode) {
@@ -513,7 +510,7 @@
         },
 
         save: function() {
-            localStorage.setItem(`vocab_v17_${this.state.name}`, JSON.stringify({
+            localStorage.setItem(`vocab_v19_${this.state.name}`, JSON.stringify({
                 wrongPool: this.state.wrongPool,
                 completedList: this.state.completedList,
                 score: this.state.score
@@ -547,14 +544,10 @@
         shuffle: function(arr) { return arr.sort(() => Math.random() - 0.5); }
     };
 
-    document.getElementById('theme-checkbox').addEventListener('change', (e) => {
-        document.documentElement.setAttribute('data-theme', e.target.checked ? 'dark' : 'light');
-    });
-
     window.onload = () => {
         const nameInput = document.getElementById('user-name');
         nameInput.oninput = () => {
-            const saved = localStorage.getItem(`vocab_v17_${nameInput.value.trim()}`);
+            const saved = localStorage.getItem(`vocab_v19_${nameInput.value.trim()}`);
             if(saved) {
                 const data = JSON.parse(saved);
                 if(data.wrongPool && data.wrongPool.length > 0) {
