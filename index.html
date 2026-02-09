@@ -38,74 +38,57 @@
             transition: 0.3s;
         }
 
-        /* [기본] 모바일용 설정 (기존과 동일) */
+        /* [기본 모바일 설정] */
         .container {
             width: 100%;
-            max-width: 500px; /* 스마트폰 기본 폭 */
+            max-width: 500px;
             padding: 20px;
             box-sizing: border-box;
             position: relative;
-            transition: max-width 0.3s ease; /* 부드러운 전환 */
-        }
-        .main-title { font-size: 2.2rem; font-weight: 800; color: var(--primary); margin-bottom: 10px; }
-        .question-box { font-size: 1.35rem; font-weight: 600; line-height: 1.6; margin-bottom: 30px; text-align: left; min-height: 60px; word-break: keep-all; }
-        .option-item { font-size: 1rem; padding: 20px; background: var(--option-bg); border: 2px solid var(--option-border); border-radius: 16px; cursor: pointer; transition: all 0.2s; text-align: left; }
-        .explanation-box { font-size: 0.95rem; color: var(--text-sub); margin-top: 10px; line-height: 1.6; border-top: 1px solid var(--option-border); padding-top: 10px; word-break: keep-all; }
-        .footer-btn { 
-            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); 
-            width: calc(100% - 40px); max-width: 460px; padding: 20px; 
-            border-radius: 50px; border: none; background: var(--primary); color: white; 
-            font-weight: bold; font-size: 1.2rem; cursor: pointer; 
-            box-shadow: 0 5px 20px rgba(0,0,0,0.2); z-index: 100;
-            transition: max-width 0.3s ease, width 0.3s ease;
+            transition: all 0.3s ease;
         }
 
-        /* [확대] 크롬북/태블릿/PC용 설정 (화면 너비 768px 이상일 때 적용) */
-        @media (min-width: 768px) {
+        /* [핵심] 크롬북/PC/태블릿용 대화면 설정 (화면 폭 800px 이상일 때) */
+        @media (min-width: 800px) {
             .container { 
-                max-width: 800px; /* 가로폭 대폭 확대 */
+                max-width: 900px !important; /* 전체 폭을 900px까지 확대 */
             }
-            .card { 
-                padding: 60px 50px !important; /* 내부 여백 확대 */
+            .card {
+                padding: 60px 50px !important; /* 카드 내부 여백 확대 */
+                border-radius: 30px !important;
             }
-            .main-title { 
-                font-size: 3.5rem !important; /* 제목 크기 확대 */
-            }
-            .question-box { 
-                font-size: 2rem !important; /* 문제 폰트 확대 */
-                margin-bottom: 50px !important;
-                line-height: 1.5 !important;
-            }
-            .option-item { 
-                font-size: 1.3rem !important; /* 보기 폰트 확대 */
-                padding: 25px !important; 
-            }
-            .explanation-box { 
-                font-size: 1.1rem !important; /* 해설 폰트 확대 */
-            }
+            /* 글자 크기 대폭 확대 */
+            .main-title { font-size: 4rem !important; margin-bottom: 30px !important; }
+            .question-box { font-size: 2.2rem !important; margin-bottom: 50px !important; line-height: 1.5 !important; }
+            .option-item { font-size: 1.5rem !important; padding: 25px !important; border-radius: 20px !important; }
+            .explanation-box { font-size: 1.3rem !important; margin-top: 15px !important; }
+            
+            /* 버튼 및 기타 UI 확대 */
             .footer-btn { 
-                max-width: 760px; /* 버튼 너비도 카드에 맞게 확대 */
-                font-size: 1.5rem; /* 버튼 글자 확대 */
-                padding: 25px;
+                max-width: 800px !important; 
+                font-size: 1.8rem !important; 
+                padding: 25px !important; 
+                border-radius: 60px !important;
             }
             .header-btn {
-                font-size: 1rem !important; /* 상단 버튼 확대 */
-                padding: 10px 16px !important;
+                font-size: 1.2rem !important;
+                padding: 12px 20px !important;
             }
-            .q-cat, .user-tag, .progress-info {
-                font-size: 1.1rem !important; /* 상단 정보 텍스트 확대 */
-            }
+            .q-cat, .user-tag { font-size: 1.2rem !important; }
+            .progress-info { font-size: 1.2rem !important; margin-top: 10px !important; }
+            .theme-switch { transform: scale(1.5); transform-origin: right center; } /* 스위치도 키움 */
+            
+            /* 보기 간격 넓힘 */
+            .options-list { gap: 20px !important; }
         }
 
         .hidden { display: none !important; }
 
-        /* 상단 바 */
         .top-bar { display: flex; justify-content: space-between; align-items: center; padding-bottom: 15px; }
         .header-btn { border: none; padding: 8px 12px; border-radius: 8px; font-size: 0.85rem; font-weight: bold; cursor: pointer; transition: 0.2s; }
         .btn-end { background: var(--text-sub); color: white; }
         .btn-review { background: var(--danger); color: white; margin-right: 5px; }
 
-        /* 테마 스위치 */
         .theme-switch { display: inline-block; height: 24px; position: relative; width: 50px; }
         .theme-switch input { display: none; }
         .slider { background-color: #ccc; bottom: 0; cursor: pointer; left: 0; position: absolute; right: 0; top: 0; transition: .4s; border-radius: 34px; }
@@ -119,28 +102,39 @@
             border: 1px solid var(--option-border); 
             box-shadow: 0 15px 35px rgba(0,0,0,0.08); 
             margin-top: 0; 
-            transition: padding 0.3s ease;
         }
+        .main-title { font-size: 2.2rem; font-weight: 800; color: var(--primary); margin-bottom: 10px; word-break: keep-all; }
 
-        /* 퀴즈 UI */
         .quiz-header { margin-bottom: 20px; border-bottom: 1px solid var(--option-border); padding-bottom: 10px; }
         .info-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
         .q-cat { font-size: 0.8rem; background: var(--option-border); padding: 3px 8px; border-radius: 6px; font-weight: bold; }
         .user-tag { color: var(--text-sub); font-size: 0.9rem; }
         
         .progress-info { display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--text-sub); font-weight: bold; margin-top: 5px; }
-        .progress-bar-bg { width: 100%; height: 6px; background: var(--option-border); border-radius: 3px; margin-top: 5px; overflow: hidden; }
+        .progress-bar-bg { width: 100%; height: 8px; background: var(--option-border); border-radius: 4px; margin-top: 5px; overflow: hidden; }
         .progress-bar-fill { height: 100%; background: var(--primary); width: 0%; transition: 0.3s; }
+
+        .question-box { font-size: 1.35rem; font-weight: 600; line-height: 1.6; margin-bottom: 30px; text-align: left; min-height: 60px; word-break: keep-all; }
         
         .options-list { display: grid; gap: 12px; }
+        .option-item { background: var(--option-bg); border: 2px solid var(--option-border); border-radius: 16px; padding: 20px; cursor: pointer; transition: all 0.2s; text-align: left; font-size: 1rem; }
         .option-item.correct { border-color: var(--success) !important; background: rgba(46, 204, 113, 0.15); }
         .option-item.wrong { border-color: var(--danger) !important; background: rgba(255, 107, 107, 0.15); }
         .option-item.dimmed { opacity: 0.6; border-color: var(--option-border); }
         
         .feedback-row { display: flex; align-items: center; margin-top: 12px; font-weight: bold; }
+        .explanation-box { font-size: 0.95rem; color: var(--text-sub); margin-top: 10px; line-height: 1.6; border-top: 1px solid var(--option-border); padding-top: 10px; word-break: keep-all; }
 
         .quiz-content-area { padding-bottom: 140px; }
 
+        .footer-btn { 
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); 
+            width: calc(100% - 40px); max-width: 460px; 
+            padding: 20px; border-radius: 50px; border: none; 
+            background: var(--primary); color: white; font-weight: bold; font-size: 1.2rem; 
+            cursor: pointer; box-shadow: 0 5px 20px rgba(0,0,0,0.2); z-index: 100;
+            transition: all 0.3s ease;
+        }
         .sub-btn { background: var(--option-bg); border: 1px solid var(--option-border); color: var(--text-main); padding: 12px 25px; border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 10px; width: 80%; }
         .badge { background: var(--danger); color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.8rem; margin-left: 5px; }
     </style>
@@ -161,10 +155,10 @@
     <div id="screen-start" class="card">
         <div class="main-title">📚 어휘력 100</div>
         <p style="color: var(--text-sub);">속담, 관용구, 고사성어</p>
-        <input type="text" id="user-name" placeholder="이름을 입력하세요" style="width:80%; padding:15px; border-radius:10px; border:1px solid var(--option-border); background:var(--option-bg); color:var(--text-main); margin:20px 0; text-align:center;">
+        <input type="text" id="user-name" placeholder="이름을 입력하세요" style="width:80%; padding:15px; border-radius:10px; border:1px solid var(--option-border); background:var(--option-bg); color:var(--text-main); margin:20px 0; text-align:center; font-size: 1.1rem;">
         <br>
-        <button onclick="app.init('normal')" style="padding:15px 50px; border-radius:12px; border:none; background:var(--primary); color:white; font-weight:bold; cursor:pointer; width:80%;">시작하기</button>
-        <button id="review-btn-start" class="sub-btn hidden" onclick="app.init('review')" style="margin-top:15px;">오답 복습하기 <span id="start-badge" class="badge">0</span></button>
+        <button onclick="app.init('normal')" style="padding:15px 50px; border-radius:12px; border:none; background:var(--primary); color:white; font-weight:bold; cursor:pointer; width:80%; font-size: 1.1rem;">시작하기</button>
+        <button id="review-btn-start" class="sub-btn hidden" onclick="app.init('review')" style="margin-top:15px; font-size: 1rem;">오답 복습하기 <span id="start-badge" class="badge">0</span></button>
     </div>
 
     <div id="screen-quiz" class="hidden quiz-content-area">
@@ -191,10 +185,10 @@
     <div id="screen-result" class="card hidden">
         <h1 id="result-title" style="color:var(--success);">수고했어요!</h1>
         <div style="font-size:3rem; font-weight:900; margin: 20px 0;" id="final-score">0 / 100</div>
-        <p id="result-msg" style="margin-bottom:30px; color:var(--text-sub); line-height:1.6;"></p>
+        <p id="result-msg" style="margin-bottom:30px; color:var(--text-sub); line-height:1.6; font-size: 1.1rem;"></p>
         
-        <button id="review-btn-result" class="sub-btn hidden" onclick="app.init('review')" style="background:var(--danger); color:white; border:none; margin-bottom:10px; width:100%;">틀린 문제 복습하기</button>
-        <button onclick="location.reload()" style="width:80%; padding:12px; border-radius:10px; border:none; background:var(--primary); color:white; font-weight:bold; cursor:pointer;">처음으로</button>
+        <button id="review-btn-result" class="sub-btn hidden" onclick="app.init('review')" style="background:var(--danger); color:white; border:none; margin-bottom:10px; width:100%; font-size: 1.1rem;">틀린 문제 복습하기</button>
+        <button onclick="location.reload()" style="width:80%; padding:12px; border-radius:10px; border:none; background:var(--primary); color:white; font-weight:bold; cursor:pointer; font-size: 1.1rem;">처음으로</button>
     </div>
 </div>
 
@@ -316,7 +310,7 @@
             if(!nameInput) return alert("이름을 입력해주세요!");
             this.state.name = nameInput;
 
-            const saved = localStorage.getItem(`vocab_v16_${nameInput}`);
+            const saved = localStorage.getItem(`vocab_v17_${nameInput}`);
             if(saved) {
                 const data = JSON.parse(saved);
                 this.state.wrongPool = data.wrongPool || [];
@@ -519,7 +513,7 @@
         },
 
         save: function() {
-            localStorage.setItem(`vocab_v16_${this.state.name}`, JSON.stringify({
+            localStorage.setItem(`vocab_v17_${this.state.name}`, JSON.stringify({
                 wrongPool: this.state.wrongPool,
                 completedList: this.state.completedList,
                 score: this.state.score
@@ -560,7 +554,7 @@
     window.onload = () => {
         const nameInput = document.getElementById('user-name');
         nameInput.oninput = () => {
-            const saved = localStorage.getItem(`vocab_v16_${nameInput.value.trim()}`);
+            const saved = localStorage.getItem(`vocab_v17_${nameInput.value.trim()}`);
             if(saved) {
                 const data = JSON.parse(saved);
                 if(data.wrongPool && data.wrongPool.length > 0) {
