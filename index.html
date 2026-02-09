@@ -6,34 +6,53 @@
     <title>어휘력 100</title>
     <style>
         :root {
-            --bg-color: #f0f2f5; --card-bg: #ffffff; --primary: #4a90e2; --text-main: #333333;
-            --text-sub: #666666; --option-bg: #f8f9fa; --option-border: #eeeeee;
-            --success: #2ecc71; --danger: #ff6b6b;
+            --bg-color: #eef2f5; /* 배경색을 조금 더 진하게 하여 카드와 구분 */
+            --card-bg: #ffffff;
+            --primary: #4a90e2;
+            --text-main: #333333;
+            --text-sub: #666666;
+            --option-bg: #f8f9fa;
+            --option-border: #eeeeee;
+            --success: #2ecc71;
+            --danger: #ff6b6b;
         }
         [data-theme='dark'] {
-            --bg-color: #121212; --card-bg: #1e1e1e; --primary: #5da2ff; --text-main: #ffffff;
-            --text-sub: #bbbbbb; --option-bg: #252525; --option-border: #333333;
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --primary: #5da2ff;
+            --text-main: #ffffff;
+            --text-sub: #bbbbbb;
+            --option-bg: #252525;
+            --option-border: #333333;
         }
-        body { font-family: 'Pretendard', sans-serif; background-color: var(--bg-color); color: var(--text-main); margin: 0; display: flex; justify-content: center; min-height: 100vh; transition: 0.3s; }
         
-        /* [기본 모바일 설정] */
-        .container { width: 100%; max-width: 500px; padding: 20px; box-sizing: border-box; position: relative; transition: max-width 0.3s ease; }
-        .card { background: var(--card-bg); padding: 40px 20px; border-radius: 20px; text-align: center; border: 1px solid var(--option-border); box-shadow: 0 10px 25px rgba(0,0,0,0.1); margin-top: 10px; transition: padding 0.3s ease; }
-        .question-box { font-size: 1.35rem; font-weight: 600; line-height: 1.6; margin-bottom: 30px; text-align: left; min-height: 60px; }
-        .option-item { background: var(--option-bg); border: 2px solid var(--option-border); border-radius: 16px; padding: 20px; cursor: pointer; transition: all 0.2s; text-align: left; font-size: 1rem; }
-        .explanation-box { font-size: 0.95rem; color: var(--text-sub); margin-top: 10px; line-height: 1.6; border-top: 1px solid var(--option-border); padding-top: 10px; }
-        .footer-btn { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: calc(100% - 40px); max-width: 460px; padding: 20px; border-radius: 50px; border: none; background: var(--primary); color: white; font-weight: bold; font-size: 1.2rem; cursor: pointer; box-shadow: 0 5px 20px rgba(0,0,0,0.2); transition: width 0.3s, max-width 0.3s; }
+        body {
+            font-family: 'Pretendard', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            display: flex;
+            justify-content: center; /* 가로 중앙 정렬 */
+            align-items: center;     /* 세로 중앙 정렬 */
+            min-height: 100vh;       /* 화면 전체 높이 사용 */
+            transition: 0.3s;
+        }
 
-        /* [크롬북/PC/태블릿용 반응형 설정] - 화면 폭이 768px 이상일 때 적용 */
+        /* [핵심 수정] 컨테이너 크기 고정 및 디자인 */
+        .container {
+            width: 100%;
+            max-width: 500px; /* 크롬북에서도 이 너비 이상 커지지 않음 */
+            padding: 20px;
+            box-sizing: border-box;
+            position: relative;
+        }
+
+        /* PC/크롬북에서 글자 크기만 살짝 키워 가독성 확보 */
         @media (min-width: 768px) {
-            .container { max-width: 720px; } /* 컨테이너 폭 확대 */
-            .card { padding: 60px 40px; margin-top: 30px; } /* 여백 확대 */
-            .main-title { font-size: 3rem !important; }
-            .question-box { font-size: 1.8rem; margin-bottom: 40px; } /* 문제 글자 확대 */
-            .option-item { padding: 25px; font-size: 1.2rem; } /* 보기 글자 확대 */
-            .explanation-box { font-size: 1.1rem; }
-            .footer-btn { max-width: 680px; font-size: 1.4rem; padding: 25px; } /* 버튼 크기 확대 */
-            .header-btn { font-size: 1rem !important; padding: 10px 16px !important; } /* 상단 버튼 확대 */
+            .container { max-width: 550px; } /* 아주 조금만 넓힘 */
+            .main-title { font-size: 2.5rem !important; }
+            .question-box { font-size: 1.5rem !important; }
+            .option-item { font-size: 1.1rem !important; padding: 22px !important; }
         }
 
         .hidden { display: none !important; }
@@ -52,7 +71,17 @@
         input:checked + .slider { background-color: var(--primary); }
         input:checked + .slider:before { transform: translateX(26px); }
 
-        .main-title { font-size: 2.2rem; font-weight: 800; color: var(--primary); margin-bottom: 10px; transition: font-size 0.3s; }
+        /* 카드 디자인 */
+        .card {
+            background: var(--card-bg);
+            padding: 40px 20px;
+            border-radius: 24px; /* 둥근 모서리 강조 */
+            text-align: center;
+            border: 1px solid var(--option-border);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.08); /* 그림자 강화 */
+            margin-top: 0; /* 중앙 정렬이므로 상단 여백 제거 */
+        }
+        .main-title { font-size: 2.2rem; font-weight: 800; color: var(--primary); margin-bottom: 10px; }
 
         /* 퀴즈 UI */
         .quiz-header { margin-bottom: 20px; border-bottom: 1px solid var(--option-border); padding-bottom: 10px; }
@@ -63,17 +92,38 @@
         .progress-info { display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--text-sub); font-weight: bold; margin-top: 5px; }
         .progress-bar-bg { width: 100%; height: 6px; background: var(--option-border); border-radius: 3px; margin-top: 5px; overflow: hidden; }
         .progress-bar-fill { height: 100%; background: var(--primary); width: 0%; transition: 0.3s; }
+
+        .question-box { font-size: 1.35rem; font-weight: 600; line-height: 1.6; margin-bottom: 30px; text-align: left; min-height: 60px; word-break: keep-all; }
         
         .options-list { display: grid; gap: 12px; }
+        .option-item { background: var(--option-bg); border: 2px solid var(--option-border); border-radius: 16px; padding: 20px; cursor: pointer; transition: all 0.2s; text-align: left; }
         .option-item.correct { border-color: var(--success) !important; background: rgba(46, 204, 113, 0.15); }
         .option-item.wrong { border-color: var(--danger) !important; background: rgba(255, 107, 107, 0.15); }
         .option-item.dimmed { opacity: 0.6; border-color: var(--option-border); }
         
         .feedback-row { display: flex; align-items: center; margin-top: 12px; font-weight: bold; }
+        .explanation-box { font-size: 0.95rem; color: var(--text-sub); margin-top: 10px; line-height: 1.6; border-top: 1px solid var(--option-border); padding-top: 10px; word-break: keep-all; }
 
-        /* 하단 여백 확보 (4번째 보기 가림 방지) */
         .quiz-content-area { padding-bottom: 140px; }
 
+        .footer-btn { 
+            position: fixed; 
+            bottom: 20px; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            width: calc(100% - 40px); 
+            max-width: 460px; /* 버튼 너비도 카드 너비에 맞춤 */
+            padding: 20px; 
+            border-radius: 50px; 
+            border: none; 
+            background: var(--primary); 
+            color: white; 
+            font-weight: bold; 
+            font-size: 1.2rem; 
+            cursor: pointer; 
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2); 
+            z-index: 100;
+        }
         .sub-btn { background: var(--option-bg); border: 1px solid var(--option-border); color: var(--text-main); padding: 12px 25px; border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 10px; width: 80%; }
         .badge { background: var(--danger); color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.8rem; margin-left: 5px; }
     </style>
@@ -127,7 +177,6 @@
         <p id="result-msg" style="margin-bottom:30px; color:var(--text-sub); line-height:1.6;"></p>
         
         <button id="review-btn-result" class="sub-btn hidden" onclick="app.init('review')" style="background:var(--danger); color:white; border:none; margin-bottom:10px; width:100%;">틀린 문제 복습하기</button>
-        
         <button onclick="location.reload()" style="width:80%; padding:12px; border-radius:10px; border:none; background:var(--primary); color:white; font-weight:bold; cursor:pointer;">처음으로</button>
     </div>
 </div>
@@ -184,11 +233,11 @@
         {c:"속담", q:"매우 빨리 먹거나 일을 순식간에 끝냄", a:"마파람에 게 눈 감추듯", d:"음식을 아주 빨리 먹어 치우는 모양을 생생하게 표현한 말입니다."},
         {c:"속담", q:"아무리 노력해도 보람 없이 헛수고함", a:"밑 빠진 독에 물 붓기", d:"근본 문제가 해결되지 않아 노력을 쏟아부어도 끝이 없는 헛수고입니다."},
         {c:"속담", q:"말은 순식간에 멀리 퍼지니 조심해야 함", a:"발 없는 말이 천 리 간다", d:"말은 사람 입을 타고 순식간에 널리 퍼지니 항상 조심하라는 경고입니다."},
-        {c:"속담", q:"욕심이 너무 많아 아주 작은 것까지 착취함", a:"벼룩의 간을 내어 먹는다", d:"약한 처지에 있는 사람의 아주 작은 것까지 빼앗는 가혹한 욕심입니다."},
+        {c:"속담", q:"욕심이 너무 많아 아주 작은 것까지 착취함", a:"벼룩의 간을 내어 먹는다", d:"매우 약한 처지에 있는 사람의 아주 작은 것까지 빼앗는 가혹한 욕심입니다."},
         {c:"속담", q:"그 분야에 오래 있으면 저절로 지식이 생김", a:"서당 개 삼 년이면 풍월을 읊는다", d:"어떤 환경에 오래 머물다 보면 저절로 그 분야의 지식을 습득하게 됨입니다."},
 
         // 관용구 30개
-        {c:"관용구", q:"아는 사람이 많고 활동 범위가 넓다", a:"발이 넓다", d:"사교성이 좋아 여기저기 아는 사람이 많음을 뜻합니다."},
+        {c:"관용구", q:"아는 사람이 많고 활동 범위가 넓다", a:"발이 넓다", d:"사교성이 좋아 여러 사람과 관계를 맺고 있음을 뜻합니다."},
         {c:"관용구", q:"기세가 꺾이거나 무안을 당하다", a:"코가 납작해지다", d:"잘난 체하다가 무안을 당해 기가 죽은 상태를 표현합니다."},
         {c:"관용구", q:"기준이 까다롭거나 눈썰미가 좋다", a:"눈이 높다", d:"자신의 실력보다 훨씬 좋은 것만 바라거나 대상을 고르는 기준이 높음입니다."},
         {c:"관용구", q:"음식을 가려 먹거나 조금 먹다", a:"입이 짧다", d:"편식이 심하거나 식사량이 적어 음식을 즐기지 않는 성향입니다."},
@@ -250,7 +299,7 @@
             if(!nameInput) return alert("이름을 입력해주세요!");
             this.state.name = nameInput;
 
-            const saved = localStorage.getItem(`vocab_v14_${nameInput}`);
+            const saved = localStorage.getItem(`vocab_v15_${nameInput}`);
             if(saved) {
                 const data = JSON.parse(saved);
                 this.state.wrongPool = data.wrongPool || [];
@@ -433,10 +482,9 @@
             
             if (isManualEnd) {
                 document.getElementById('result-title').innerText = "학습 종료";
-                // 요청사항: 11 / 100 처럼 표시
                 document.getElementById('final-score').innerText = `${this.state.completedList.length} / 100`;
                 document.getElementById('result-msg').innerText = "오늘 학습을 마쳤습니다.";
-                reviewBtn.classList.add('hidden'); 
+                reviewBtn.classList.add('hidden'); // 수동 종료 시 복습 버튼 숨김
             } else {
                 if(this.state.mode === 'normal') {
                     document.getElementById('result-title').innerText = "완주 성공!";
@@ -454,7 +502,7 @@
         },
 
         save: function() {
-            localStorage.setItem(`vocab_v14_${this.state.name}`, JSON.stringify({
+            localStorage.setItem(`vocab_v15_${this.state.name}`, JSON.stringify({
                 wrongPool: this.state.wrongPool,
                 completedList: this.state.completedList,
                 score: this.state.score
@@ -495,7 +543,7 @@
     window.onload = () => {
         const nameInput = document.getElementById('user-name');
         nameInput.oninput = () => {
-            const saved = localStorage.getItem(`vocab_v14_${nameInput.value.trim()}`);
+            const saved = localStorage.getItem(`vocab_v15_${nameInput.value.trim()}`);
             if(saved) {
                 const data = JSON.parse(saved);
                 if(data.wrongPool && data.wrongPool.length > 0) {
